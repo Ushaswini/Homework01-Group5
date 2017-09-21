@@ -2,6 +2,7 @@ package example.com.messageme;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,10 +18,10 @@ public class LoginActivity extends AppCompatActivity {
 
     Button login;
     Button newUser;
-    User user;
-    final static String USER_KEY = "USER";
+
     final static String TOKEN_KEY = "TOKEN";
     String token;
+    SharedPreferences mPrefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +37,14 @@ public class LoginActivity extends AppCompatActivity {
 
         login = (Button) findViewById(R.id.buttonLogin);
         newUser = (Button) findViewById(R.id.buttonNewUser);
+        mPrefs = getSharedPreferences("authToken",MODE_PRIVATE);
+        token = mPrefs.getString("token","");
+        if(!token.isEmpty()){
+            Intent intent = new Intent(LoginActivity.this, InboxActivity.class);
+            intent.putExtra(TOKEN_KEY,token);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        }
 
         login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -43,21 +52,27 @@ public class LoginActivity extends AppCompatActivity {
 
                 String username = ((EditText) findViewById(R.id.editTextUserName)).getText().toString();
                 String pwd = ((EditText) findViewById(R.id.editTextPassword)).getText().toString();
-                final RequestParams params = new RequestParams("POST", "http://apidevelopment-inclass01.azurewebsites.net/Token");
-                params.addParams("username", username);
-                params.addParams("password", pwd);
+                final RequestParams params = new RequestParams("POST", "http://homework01.azurewebsites.net/oauth2/token");
+                params.addParams("UserName", username);
+                params.addParams("Password", pwd);
                 params.addParams("grant_type", "password");
-
 
                 new GetTokenAsyncTask(new GetTokenAsyncTask.IGetTokenString() {
                     @Override
                     public void getTokenForUser(String s) {
                         token = s;
-
+                        mPrefs.edit().putString("token",token).apply();
                         if (token.length() != 0 && token != null) {
-                            Intent intent = new Intent(LoginActivity.this, InboxActivity.class);
-                            intent.putExtra(TOKEN_KEY,token);
-                            startActivity(intent);
+
+
+                                    //user = userProfile;
+                                    Intent intent = new Intent(LoginActivity.this, InboxActivity.class);
+                                    intent.putExtra(TOKEN_KEY,token);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    startActivity(intent);
+
+                        }else {
+                            Toast.makeText(LoginActivity.this, "", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }).execute(params);

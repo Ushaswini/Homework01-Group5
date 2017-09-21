@@ -33,6 +33,7 @@ public class GetTokenAsyncTask extends AsyncTask<RequestParams, Void, String> {
             HttpURLConnection con = params[0].createConnection();
             BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
             String line = "";
+
             while ((line = reader.readLine()) != null){
                 sb.append(line);
             }

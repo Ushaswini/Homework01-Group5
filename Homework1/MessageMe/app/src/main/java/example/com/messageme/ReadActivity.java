@@ -1,13 +1,17 @@
 package example.com.messageme;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 public class ReadActivity extends AppCompatActivity {
 
@@ -15,6 +19,12 @@ public class ReadActivity extends AppCompatActivity {
     ImageButton deleteButton;
     ImageButton replyButton;
     ImageView imgPerson;
+    TextView sender,messageBody,region;
+    final static String SENDER_KEY = "SENDER";
+    final static String REGION_KEY = "REGION";
+    final static String REPLY_KEY = "REPLY";
+    final static boolean ISAREPLY = true;
+    CustMessage msg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,12 +38,16 @@ public class ReadActivity extends AppCompatActivity {
         //menu.setTitle("Read Message");
         setContentView(R.layout.activity_read);
 
-           /*deleteButton = new ImageButton(ReadActivity.this);
-        deleteButton.setImageResource(R.drawable.ic_action_discard);
-        replyButton = new ImageButton(ReadActivity.this);
-        replyButton.setImageResource(R.drawable.ic_action_reply);*/
-        //actionBar.setCustomView(deleteButton);
-        //actionBar.setCustomView(replyButton);
+        sender = (TextView)findViewById(R.id.textViewToName);
+        region = (TextView)findViewById(R.id.textViewRegionName);
+        messageBody = (TextView)findViewById(R.id.EditTextMessage);
+
+        if(getIntent().getExtras() != null){
+            msg = (CustMessage) getIntent().getExtras().getSerializable(InboxActivity.MSG_KEY);
+            sender.setText("FROM: " + msg.getSender());
+            region.setText("REGION: " + getMessageRegionName(Integer.parseInt(msg.getRegionName())));
+            messageBody.setText(msg.getTextMessage());
+        }
 
 
 
@@ -45,8 +59,24 @@ public class ReadActivity extends AppCompatActivity {
         return true;
     }
 
+
     @Override
-    public void onOptionsMenuClosed(Menu menu) {
-        super.onOptionsMenuClosed(menu);
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == R.id.deleteButton)
+        {
+
+        }else if(item.getItemId() == R.id.replyButton){
+            Intent intent = new Intent(ReadActivity.this,ComposeMessageActivity.class);
+            intent.putExtra(SENDER_KEY,msg.getSender());
+            intent.putExtra(REGION_KEY,getMessageRegionName(Integer.parseInt(msg.getRegionName())));
+            intent.putExtra(REPLY_KEY,ISAREPLY);
+            Log.d("sender",sender.getText().toString());
+            startActivity(intent);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public String getMessageRegionName(int regionId){
+        return "Region " + regionId;
     }
 }

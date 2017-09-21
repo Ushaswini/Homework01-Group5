@@ -30,6 +30,8 @@ public class ComposeMessageActivity extends AppCompatActivity {
     private BeaconManager beaconManager;
     private BeaconRegion region1, region2, region3;
     ArrayList<String> regionArrayList;
+    ArrayList<String> allUsersList;
+    boolean isareply;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,37 +45,52 @@ public class ComposeMessageActivity extends AppCompatActivity {
         menu.setTitle("Compose Message");
         setContentView(R.layout.activity_compose_message);
 
+        isareply = false;
         regionArrayList = new ArrayList<>();
 
         toName = (TextView)findViewById(R.id.textViewToName);
-        contactsListBuilder = new AlertDialog.Builder(ComposeMessageActivity.this);
-        contactsListBuilder.setTitle("Users")
-                .setCancelable(false)
-                .setItems(new CharSequence[10], new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        toName.setText("");
-                    }
-                });
-
-        contactsList = contactsListBuilder.create();
-
-        imgPerson = (ImageView)findViewById(R.id.imageViewPerson);
-        imgPerson.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                contactsList.show();
-            }
-        });
-
         region = (TextView)findViewById(R.id.textViewRegionName);
+        if(getIntent().getExtras() != null){
+            toName.setText("TO: " + getIntent().getExtras().getString(ReadActivity.SENDER_KEY));
+            region.setText("REGION: " + getIntent().getExtras().getString(ReadActivity.REGION_KEY));
+            isareply = getIntent().getExtras().getBoolean(ReadActivity.REPLY_KEY,false);
+        }
+
+        contactsListBuilder = new AlertDialog.Builder(ComposeMessageActivity.this);
+
+        if(!isareply) {
+            imgPerson = (ImageView) findViewById(R.id.imageViewPerson);
+            imgPerson.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    new GetUsersAsyncTask(new GetUsersAsyncTask.IGetProfile() {
+                        @Override
+                        public void getSenderName(ArrayList<String> names) {
+                            allUsersList = names;
+                            contactsListBuilder.setTitle("Contacts")
+                                    .setCancelable(false)
+                                    .setItems(allUsersList.toArray(new String[allUsersList.size()]), new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            toName.setText("TO: " + allUsersList.get(i));
+                                        }
+                                    });
+                            contactsList = contactsListBuilder.create();
+                            contactsList.show();
+                        }
+                    }).execute("http://homework01.azurewebsites.net/api/Users");
+
+                }
+            });
+        }
+
         regionsListBuilder = new AlertDialog.Builder(ComposeMessageActivity.this);
         regionsListBuilder.setTitle("Regions")
                 .setCancelable(false)
                 .setItems(new CharSequence[10], new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        region.setText("");
+                        region.setText("REGION: " + regionArrayList.get(i));
                     }
                 });
 

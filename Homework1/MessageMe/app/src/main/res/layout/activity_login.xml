@@ -9,8 +9,8 @@
     <RelativeLayout
         android:layout_width="368dp"
         android:layout_height="495dp"
-        tools:layout_editor_absoluteY="8dp"
-        tools:layout_editor_absoluteX="8dp">
+        android:layout_margin="10dp"
+        android:padding="10dp">
 
         <EditText
             android:id="@+id/editTextUserName"
@@ -34,10 +34,11 @@
             android:layout_alignStart="@+id/editTextUserName"
             android:layout_below="@+id/editTextUserName"
             android:layout_marginTop="35dp"
-            android:layout_marginRight="21dp"
             android:ems="10"
             android:hint="Password"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
 
         <Button
             android:id="@+id/buttonLogin"
