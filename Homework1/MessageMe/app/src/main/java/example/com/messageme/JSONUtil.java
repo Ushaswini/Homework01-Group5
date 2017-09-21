@@ -47,6 +47,9 @@ public class JSONUtil {
                 if (root.has("Id")){
                     msg.setMsgId(root.getInt("Id"));
                 }
+                if(root.has("IsUnLocked")){
+                    msg.setLocked(!root.getBoolean("IsUnLocked"));
+                }
                 messageArrayList.add(msg);
             }
         } catch (JSONException e) {

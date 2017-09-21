@@ -64,7 +64,8 @@ public class ReadActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == R.id.deleteButton)
         {
-
+            new DeletemessagesAsyncTask().execute("http://homework01.azurewebsites.net/api/Messages/"+msg.getMsgId());
+            finish();
         }else if(item.getItemId() == R.id.replyButton){
             Intent intent = new Intent(ReadActivity.this,ComposeMessageActivity.class);
             intent.putExtra(SENDER_KEY,msg.getSender());

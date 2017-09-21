@@ -11,9 +11,16 @@ import java.text.SimpleDateFormat;
 public class CustMessage implements Serializable {
 
     String sender, receiver, textMessage, regionName, date, time;
-    boolean isRead;
+    boolean isRead, isLocked;
     int msgId;
 
+    public boolean isLocked() {
+        return isLocked;
+    }
+
+    public void setLocked(boolean locked) {
+        isLocked = locked;
+    }
 
     public int getMsgId() {
         return msgId;
