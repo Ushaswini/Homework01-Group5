@@ -42,6 +42,7 @@ public class MessagesArrayAdapter extends ArrayAdapter<CustMessage> {
             holder.date = (TextView) convertView.findViewById(R.id.tvDate);
             holder.time = (TextView) convertView.findViewById(R.id.tvTime);
             holder.isRead = (ImageView)convertView.findViewById(R.id.imageViewRead) ;
+            holder.isLocked =(ImageView)convertView.findViewById(R.id.imageViewLock);
             convertView.setTag(holder);
         }
 
@@ -55,6 +56,11 @@ public class MessagesArrayAdapter extends ArrayAdapter<CustMessage> {
         }else{
             holder.isRead.setImageResource(R.drawable.circle_blue);
         }
+        if(msg.isLocked()){
+            holder.isLocked.setImageResource(R.drawable.lock);
+        }else{
+            holder.isLocked.setImageResource(R.drawable.lock_open);
+        }
         return convertView;
     }
 
@@ -63,5 +69,6 @@ public class MessagesArrayAdapter extends ArrayAdapter<CustMessage> {
         TextView date;
         TextView time;
         ImageView isRead;
+        ImageView isLocked;
     }
 }

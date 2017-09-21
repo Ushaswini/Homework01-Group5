@@ -76,6 +76,5 @@ public class GetMessagesAsyncTask extends AsyncTask<RequestParams,Void,ArrayList
             }, trackArrayList.get(finalI).getSender()).execute("http://homework01.azurewebsites.net/api/Users");
         }
 
-
     }
 }
