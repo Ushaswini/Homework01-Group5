@@ -42,9 +42,9 @@ public class SignUpActivity extends AppCompatActivity {
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                userParams.put("firstName",firstName.getText().toString());
-                userParams.put("lastName",lastName.getText().toString());
-                userParams.put("userName",userName.getText().toString());
+                userParams.put("FirstName",firstName.getText().toString());
+                userParams.put("LastName",lastName.getText().toString());
+                userParams.put("UserName",userName.getText().toString());
                 userParams.put("Password",pwd.getText().toString());
                 userParams.put("ConfirmPassword",cPwd.getText().toString());
 
@@ -53,11 +53,10 @@ public class SignUpActivity extends AppCompatActivity {
                     public void getSignUpMessage(String message) {
                         Toast.makeText(SignUpActivity.this,message,Toast.LENGTH_SHORT).show();
                         if(message.equals("Account created succesfully")) {
-                            final RequestParams params = new RequestParams("POST", "http://apidevelopment-inclass01.azurewebsites.net/Token");
+                            final RequestParams params = new RequestParams("POST", "http://homework01.azurewebsites.net/oauth2/token");
                             params.addParams("username", userName.getText().toString());
                             params.addParams("password", pwd.getText().toString());
                             params.addParams("grant_type", "password");
-
 
                             new GetTokenAsyncTask(new GetTokenAsyncTask.IGetTokenString() {
                                 @Override
@@ -73,7 +72,7 @@ public class SignUpActivity extends AppCompatActivity {
                             }).execute(params);
                         }
                     }
-                },userParams).execute("http://apidevelopment-inclass01.azurewebsites.net/api/Account/Register");
+                },userParams).execute("http://homework01.azurewebsites.net/api/Account/Register");
             }
         });
 

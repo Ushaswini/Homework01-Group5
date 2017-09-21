@@ -3,6 +3,7 @@ package example.com.messageme;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -57,9 +58,24 @@ public class GetMessagesAsyncTask extends AsyncTask<RequestParams,Void,ArrayList
     }
 
     @Override
-    protected void onPostExecute(ArrayList<CustMessage> trackArrayList) {
-        super.onPostExecute(trackArrayList);
-        iAsyncPassMessages.getArrayList(trackArrayList);
-        progressDialog.dismiss();
+    protected void onPostExecute(final ArrayList<CustMessage> trackArrayList) {
+        //super.onPostExecute(trackArrayList);
+       for (int i = 0; i < trackArrayList.size(); i++) {
+            final int finalI = i;
+            //Log.d("name",i  + "");
+            new GetSenderAsyncTask(new GetSenderAsyncTask.IGetProfile() {
+                @Override
+                public void getSenderName(String name) {
+                    Log.d("name",name );
+                    trackArrayList.get(finalI).setSender(name);
+                    if(finalI == trackArrayList.size() -1 ){
+                        progressDialog.dismiss();
+                        iAsyncPassMessages.getArrayList(trackArrayList);
+                    }
+                }
+            }, trackArrayList.get(finalI).getSender()).execute("http://homework01.azurewebsites.net/api/Users");
+        }
+
+
     }
 }

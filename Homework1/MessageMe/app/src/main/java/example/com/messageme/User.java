@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 public class User implements Serializable {
 
-    String firstName, lastName, userName, password;
+    String firstName, lastName, userName, password, Id;
 
     public String getFirstName() {
         return firstName;
@@ -40,5 +40,13 @@ public class User implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getId() {
+        return Id;
+    }
+
+    public void setId(String id) {
+        Id = id;
     }
 }

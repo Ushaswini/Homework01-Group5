@@ -3,6 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     package="example.com.messageme">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -11,19 +15,22 @@
         android:roundIcon="@drawable/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity"></activity>
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".InboxActivity" />
-        <activity
-            android:name=".ReadActivity"
-            android:logo="@drawable/ic_launcher"
-            android:label="Read Message">
+        <activity android:name=".MainActivity">
+        </activity>
+        <activity android:name=".LoginActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".InboxActivity" />
+        <activity
+            android:name=".ReadActivity"
+            android:logo="@drawable/ic_launcher"
+            android:label="Read Message">
+        </activity>
+        <activity android:name=".SignUpActivity"></activity>
         <activity android:name=".ComposeMessageActivity"></activity>
     </application>
 

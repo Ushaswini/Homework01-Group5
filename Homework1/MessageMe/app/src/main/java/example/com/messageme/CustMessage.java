@@ -1,6 +1,8 @@
 package example.com.messageme;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 /**
  * Created by Nitin on 9/18/2017.
@@ -10,9 +12,16 @@ public class CustMessage implements Serializable {
 
     String sender, receiver, textMessage, regionName, date, time;
     boolean isRead;
+    int msgId;
 
 
+    public int getMsgId() {
+        return msgId;
+    }
 
+    public void setMsgId(int msgId) {
+        this.msgId = msgId;
+    }
 
     public String getSender() {
         return sender;
@@ -60,6 +69,17 @@ public class CustMessage implements Serializable {
 
     public void setDate(String date) {
         this.date = date;
+
+        this.date = date;
+
+        final String outputFormat = "MM-dd-yyyy ";
+        final String inputFormat = "MM/dd/yyyy HH:mm:ss a";
+
+        try {
+            this.date = new SimpleDateFormat(outputFormat).format(new SimpleDateFormat(inputFormat).parse(this.date));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     public String getTime() {

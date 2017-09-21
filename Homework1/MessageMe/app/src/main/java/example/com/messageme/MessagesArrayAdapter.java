@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -19,13 +20,14 @@ import java.util.List;
 public class MessagesArrayAdapter extends ArrayAdapter<CustMessage> {
     Context mContext;
     int mResource;
-    List<CustMessage> musicTracks;
+    List<CustMessage> custMessages;
+
 
     public MessagesArrayAdapter(@NonNull Context context, @LayoutRes int resource, @NonNull List<CustMessage> objects) {
         super(context, resource, objects);
         this.mContext = context;
         this.mResource = resource;
-        this.musicTracks= objects;
+        this.custMessages = objects;
     }
 
     @NonNull
@@ -39,16 +41,20 @@ public class MessagesArrayAdapter extends ArrayAdapter<CustMessage> {
             holder.senderName = (TextView) convertView.findViewById(R.id.tvSenderName);
             holder.date = (TextView) convertView.findViewById(R.id.tvDate);
             holder.time = (TextView) convertView.findViewById(R.id.tvTime);
+            holder.isRead = (ImageView)convertView.findViewById(R.id.imageViewRead) ;
             convertView.setTag(holder);
         }
 
-        CustMessage msg = new CustMessage();
+        CustMessage msg = custMessages.get(position);
         holder= (ViewHolder) convertView.getTag();
         holder.senderName.setText(msg.getSender());
         holder.date.setText(msg.getDate());
         holder.time.setText(msg.getTime());
-
-
+        if(msg.isRead()){
+            holder.isRead.setImageResource(R.drawable.circle_grey);
+        }else{
+            holder.isRead.setImageResource(R.drawable.circle_blue);
+        }
         return convertView;
     }
 
@@ -56,5 +62,6 @@ public class MessagesArrayAdapter extends ArrayAdapter<CustMessage> {
         TextView senderName;
         TextView date;
         TextView time;
+        ImageView isRead;
     }
 }
