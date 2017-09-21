@@ -14,6 +14,7 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
+import com.estimote.coresdk.common.requirements.SystemRequirementsChecker;
 import com.estimote.coresdk.observation.region.beacon.BeaconRegion;
 import com.estimote.coresdk.recognition.packets.Beacon;
 import com.estimote.coresdk.service.BeaconManager;
@@ -118,9 +119,16 @@ public class InboxActivity extends AppCompatActivity {
         region3 = new BeaconRegion("Region 3", UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"),26535,null);
         beaconManager = new BeaconManager(getApplicationContext());
         beaconManager.setForegroundScanPeriod(2,8000);
-        beaconManager.startRanging(region1);
-        beaconManager.startRanging(region2);
-        beaconManager.startRanging(region3);
+        SystemRequirementsChecker.checkWithDefaultDialogs(InboxActivity.this);
+        beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
+            @Override
+            public void onServiceReady() {
+                beaconManager.startRanging(region1);
+                beaconManager.startRanging(region2);
+                beaconManager.startRanging(region3);
+            }
+        });
+
         lastActiveTimeRegion1 = 0;lastActiveTimeRegion2 = 0;lastActiveTimeRegion3 = 0;
 
         beaconManager.setRangingListener(new BeaconManager.BeaconRangingListener() {
@@ -129,40 +137,58 @@ public class InboxActivity extends AppCompatActivity {
 
                 if(lastActiveTimeRegion1 == 0) {
                     lastActiveTimeRegion1 = (new Date()).getTime();
+
                 }
                 if(lastActiveTimeRegion2 == 0) {
                     lastActiveTimeRegion2= (new Date()).getTime();
+
                 }
                 if(lastActiveTimeRegion3 == 0) {
                     lastActiveTimeRegion3 = (new Date()).getTime();
+
                 }
                 if(messagesList.size()>0) {
-                    if (((new Date()).getTime() - lastActiveTimeRegion1) > 100000) {
-                        for(CustMessage msg : messagesList) {
-                            if(msg.isLocked() && msg.getRegionName()== beaconRegion.getIdentifier())
-                            {
-                                msg.setLocked(false);
-                            }
-                        }
+                    for (CustMessage msg : messagesList) {
+                    if (((new Date()).getTime() - lastActiveTimeRegion1) > 4000) {
 
+                            Log.d("time1", ((new Date()).getTime() - lastActiveTimeRegion1) + "");
+
+                            Log.d("Beaconregion", beaconRegion.getIdentifier() + msg.isLocked());
+                            if (msg.isLocked() && ("Region " + msg.getRegionName()) == beaconRegion.getIdentifier()) {
+                                //msg.setLocked(false);
+                                new MarkUnlockedAsynctask().execute("http://homework01.azurewebsites.net/api/Messages/EditLockStatus?messageId=" + msg.getMsgId());
+                                adapter.notifyDataSetChanged();
+                                Log.d("Beacon", "1" + msg.isLocked() + " " + msg.getMsgId());
+                            }
+
+
+                            if (((new Date()).getTime() - lastActiveTimeRegion2) > 4000) {
+                                Log.d("time2", ((new Date()).getTime() - lastActiveTimeRegion1) + "");
+
+                                Log.d("Beacons", msg.getRegionName() + "  " + beaconRegion.getIdentifier());
+                                if (msg.isLocked() && "Region " + msg.getRegionName() == beaconRegion.getIdentifier()) {
+                                    new MarkUnlockedAsynctask().execute("http://homework01.azurewebsites.net/api/Messages/EditLockStatus?messageId=" + msg.getMsgId());
+                                    adapter.notifyDataSetChanged();
+                                    Log.d("Beacon", "2" + msg.isLocked() + " " + msg.getMsgId());
+                                }
+
+
+                            }
+                            if (((new Date()).getTime() - lastActiveTimeRegion3) > 4000) {
+                                Log.d("time3", ((new Date()).getTime() - lastActiveTimeRegion1) + "");
+
+                                if (msg.isLocked() && "Region " + msg.getRegionName() == beaconRegion.getIdentifier()) {
+                                    new MarkUnlockedAsynctask().execute("http://homework01.azurewebsites.net/api/Messages/EditLockStatus?messageId=" + msg.getMsgId());
+                                    adapter.notifyDataSetChanged();
+                                    Log.d("Beacon", "3" + msg.isLocked() + " " + msg.getMsgId());
+                                }
+                            }
+
+                        }
                     }
-                    if (((new Date()).getTime() - lastActiveTimeRegion2) > 100000) {
-                        for(CustMessage msg : messagesList) {
-                            if(msg.isLocked() && msg.getRegionName()== beaconRegion.getIdentifier())
-                            {
-                                msg.setLocked(false);
-                            }
-                        }
-
-                    }if (((new Date()).getTime() - lastActiveTimeRegion3) > 100000) {
-                        for(CustMessage msg : messagesList) {
-                            if(msg.isLocked() && msg.getRegionName()== beaconRegion.getIdentifier())
-                            {
-                                msg.setLocked(false);
-                            }
-                        }
-
-                    }
+                }else{
+                    beaconManager.stopRanging(region1);beaconManager.stopRanging(region2);
+                    beaconManager.stopRanging(region3);
                 }
             }
         });
@@ -202,16 +228,22 @@ public class InboxActivity extends AppCompatActivity {
             @Override
             public int compare(CustMessage o1, CustMessage o2) {
                 int returnValue = 0;
-                try {
-                    if(new SimpleDateFormat("MM-dd-yyyy").parse(o1.getDate()).before(new SimpleDateFormat("MM-dd-yyyy").parse(o2.getDate())))// > 0 ? 1 : 0;
-                    {returnValue = -1;}
-                    else if(new SimpleDateFormat("MM-dd-yyyy").parse(o1.getDate()).after(new SimpleDateFormat("MM-dd-yyyy").parse(o2.getDate())))// > 0 ? 1 : 0;
-                    {returnValue = 1; }
+                if (o1.date != null && o2.date != null) {
+                    try {
+                        if (new SimpleDateFormat("MM-dd-yyyy").parse(o1.getDate()).before(new SimpleDateFormat("MM-dd-yyyy").parse(o2.getDate())))// > 0 ? 1 : 0;
+                        {
+                            returnValue = -1;
+                        } else if (new SimpleDateFormat("MM-dd-yyyy").parse(o1.getDate()).after(new SimpleDateFormat("MM-dd-yyyy").parse(o2.getDate())))// > 0 ? 1 : 0;
+                        {
+                            returnValue = 1;
+                        }
 
-                } catch (ParseException e) {
-                    e.printStackTrace();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+
                 }
-
                 return returnValue;
             }
         });
