@@ -12,7 +12,8 @@
 		"2b310beb-a436-b373-5421-6335d9d91b42",
 		"c107acc7-3263-84e0-854e-fdf40525e60a",
 		"1286cb0f-a85d-e8a0-44dd-1e38b0fa2571",
-		"6463ce67-5eaa-a973-0557-49ed41f6a647"
+		"6463ce67-5eaa-a973-0557-49ed41f6a647",
+		"15f454b7-6b68-61b0-d454-dedd9c9efbb7"
 	],
 	"folders": [],
 	"folders_order": [],
@@ -45,6 +46,78 @@
 			"description": "",
 			"descriptionFormat": "html",
 			"time": 1505975066089,
+			"version": 2,
+			"responses": [],
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {}
+		},
+		{
+			"id": "15f454b7-6b68-61b0-d454-dedd9c9efbb7",
+			"headers": "//Authorization: Bearer \nContent-Type: application/x-www-form-urlencoded\n",
+			"headerData": [
+				{
+					"key": "Authorization",
+					"value": "Bearer ",
+					"description": "",
+					"enabled": false
+				},
+				{
+					"key": "Content-Type",
+					"value": "application/x-www-form-urlencoded",
+					"description": "",
+					"enabled": true
+				}
+			],
+			"url": "http://homework01.azurewebsites.net/api/Account/Register",
+			"queryParams": [],
+			"pathVariables": {},
+			"pathVariableData": [],
+			"preRequestScript": null,
+			"method": "POST",
+			"collectionId": "8b6db310-113e-1bd7-73ed-f52f9a565952",
+			"data": [
+				{
+					"key": "UserName",
+					"value": "advmad",
+					"description": "",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "FirstName",
+					"value": "Advance",
+					"description": "",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "LastName",
+					"value": "Mad",
+					"description": "",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "Password",
+					"value": "test1",
+					"description": "",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "ConfirmPassword",
+					"value": "test1",
+					"description": "",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "urlencoded",
+			"name": "Register",
+			"description": "",
+			"descriptionFormat": "html",
+			"time": 1506027750026,
 			"version": 2,
 			"responses": [],
 			"tests": null,
@@ -154,7 +227,7 @@
 			"collectionId": "8b6db310-113e-1bd7-73ed-f52f9a565952",
 			"data": null,
 			"dataMode": "params",
-			"name": "Messages",
+			"name": "GetMessagesList",
 			"description": "",
 			"descriptionFormat": "html",
 			"time": 1505863475752,
@@ -313,7 +386,7 @@
 				}
 			],
 			"dataMode": "urlencoded",
-			"name": "Send Message",
+			"name": "DeleteMessage",
 			"description": "",
 			"descriptionFormat": "html",
 			"time": 1505940655494,
@@ -374,7 +447,7 @@
 			"collectionId": "8b6db310-113e-1bd7-73ed-f52f9a565952",
 			"data": null,
 			"dataMode": "params",
-			"name": "Users",
+			"name": "GetUsersList",
 			"description": "",
 			"descriptionFormat": "html",
 			"time": 1505863211996,
@@ -428,7 +501,7 @@
 			"collectionId": "8b6db310-113e-1bd7-73ed-f52f9a565952",
 			"data": null,
 			"dataMode": "params",
-			"name": "Regions",
+			"name": "GetRegionsList",
 			"description": "",
 			"descriptionFormat": "html",
 			"time": 1505860626340,
