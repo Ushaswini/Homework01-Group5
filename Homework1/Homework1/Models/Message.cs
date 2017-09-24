@@ -14,8 +14,12 @@ namespace Homework1.Models
         public string SenderId { get; set; }
         public string RegionId { get; set; }
         public bool IsUnLocked { get; set; }
-
         public string MessageTime { get; set; }
+
+        //Navigation properties
+        public ApplicationUser Receiver { get; set; }
+        public ApplicationUser Sender { get; set; }
+        public Region Region { get; set; }
 
     }
 }

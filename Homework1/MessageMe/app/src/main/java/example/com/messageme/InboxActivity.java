@@ -114,6 +114,7 @@ public class InboxActivity extends AppCompatActivity {
                 }
             }
         });
+
         region1 = new BeaconRegion("Region 1", UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"),1564,null);
         region2 = new BeaconRegion("Region 2", UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"),15212,null);
         region3 = new BeaconRegion("Region 3", UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"),26535,null);

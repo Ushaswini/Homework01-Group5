@@ -25,16 +25,21 @@ namespace Homework1.Controllers
 
         // GET: api/Messages
         
-        public IQueryable<Message> GetMessages()
+        public IList<Message> GetMessages()
         {
-            return db.Messages;
+            return db.Messages.Include(m => m.Region)
+                                .Include(m => m.Receiver)
+                                .Include(m =>m.Sender).ToList();
         }
         
         
-        public IQueryable<Message> GetMessagesForReceiver(string receiverId)
+        public IList<Message> GetMessagesForReceiver(string receiverId)
         {
-            var result = from d in db.Messages where d.ReceiverId == (receiverId) select d;
-            return result;
+            var result =  db.Messages.Include(m => m.Region)
+                                .Include(m => m.Receiver)
+                                .Include(m => m.Sender).Where(m => m.ReceiverId == receiverId);
+            //var result = from d in db.Messages where d.ReceiverId == (receiverId) select d;
+            return result.ToList();
         }
 
         //api/Messages/EditReadStatus

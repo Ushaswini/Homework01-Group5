@@ -265,6 +265,10 @@
     <Compile Include="Migrations\201709201900396_message-time.Designer.cs">
       <DependentUpon>201709201900396_message-time.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201709221723368_message-details.cs" />
+    <Compile Include="Migrations\201709221723368_message-details.Designer.cs">
+      <DependentUpon>201709221723368_message-details.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\Initializer.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -312,6 +316,8 @@
     </Content>
     <Content Include="keys.config" />
     <None Include="Properties\PublishProfiles\Homework01 - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\Homework1-Group5 - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\Homework120170924012411 - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -373,6 +379,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201709201900396_message-time.resx">
       <DependentUpon>201709201900396_message-time.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709221723368_message-details.resx">
+      <DependentUpon>201709221723368_message-details.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
