@@ -76,35 +76,35 @@
 			"data": [
 				{
 					"key": "UserName",
-					"value": "advmad",
+					"value": "rinc",
 					"description": "",
 					"type": "text",
 					"enabled": true
 				},
 				{
 					"key": "FirstName",
-					"value": "Advance",
+					"value": "Rebbeca",
 					"description": "",
 					"type": "text",
 					"enabled": true
 				},
 				{
 					"key": "LastName",
-					"value": "Mad",
+					"value": "Ince",
 					"description": "",
 					"type": "text",
 					"enabled": true
 				},
 				{
 					"key": "Password",
-					"value": "test1",
+					"value": "test5",
 					"description": "",
 					"type": "text",
 					"enabled": true
 				},
 				{
 					"key": "ConfirmPassword",
-					"value": "test1",
+					"value": "test5",
 					"description": "",
 					"type": "text",
 					"enabled": true
@@ -115,7 +115,7 @@
 			"tests": null,
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1506293599544,
+			"time": 1506293919831,
 			"name": "Register",
 			"description": "",
 			"collectionId": "8b6db310-113e-1bd7-73ed-f52f9a565952",
@@ -132,11 +132,11 @@
 					"enabled": true
 				}
 			],
-			"url": "http://homework1-group5.azurewebsites.net/api/Account/UserInfo?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1bmlxdWVfbmFtZSI6ImRjOTk5ZGNlLWZjODEtNDRlZC04YTNkLWJhOGM3NzE5YTc5MiIsInN1YiI6ImFnaWJzb24iLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjUwMDAvIiwiZXhwIjoxNTA1OTQ1NDQ4LCJuYmYiOjE1MDU5NDM2NDh9.ilL7iGIxY8-M1sYIZeLQ8scnx4dlFMK4-Ut1shOWMC4",
+			"url": "http://homework1-group5.azurewebsites.net/api/Account/UserInfo?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1bmlxdWVfbmFtZSI6IjhjMmY2OWQ3LTQ1NTktNDUzMS04M2Q1LTY0OGQzNDEwY2JmZCIsInN1YiI6ImFnaWJzb24iLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjUwMDAvIiwiZXhwIjoxNTA2Mjk4MzQ1LCJuYmYiOjE1MDYyOTY1NDV9.PVQLyRVaM2XYsFQFsGmJXOHEEn8PLhi2eblIAomABT0",
 			"queryParams": [
 				{
 					"key": "token",
-					"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1bmlxdWVfbmFtZSI6ImRjOTk5ZGNlLWZjODEtNDRlZC04YTNkLWJhOGM3NzE5YTc5MiIsInN1YiI6ImFnaWJzb24iLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjUwMDAvIiwiZXhwIjoxNTA1OTQ1NDQ4LCJuYmYiOjE1MDU5NDM2NDh9.ilL7iGIxY8-M1sYIZeLQ8scnx4dlFMK4-Ut1shOWMC4",
+					"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1bmlxdWVfbmFtZSI6IjhjMmY2OWQ3LTQ1NTktNDUzMS04M2Q1LTY0OGQzNDEwY2JmZCIsInN1YiI6ImFnaWJzb24iLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjUwMDAvIiwiZXhwIjoxNTA2Mjk4MzQ1LCJuYmYiOjE1MDYyOTY1NDV9.PVQLyRVaM2XYsFQFsGmJXOHEEn8PLhi2eblIAomABT0",
 					"equals": true,
 					"description": "",
 					"enabled": true
@@ -151,7 +151,7 @@
 			"tests": null,
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1506293551688,
+			"time": 1506297400773,
 			"name": "Get user info",
 			"description": "",
 			"collectionId": "8b6db310-113e-1bd7-73ed-f52f9a565952",
@@ -184,14 +184,14 @@
 				},
 				{
 					"key": "username",
-					"value": "ushav",
+					"value": "agibson",
 					"description": "",
 					"type": "text",
 					"enabled": true
 				},
 				{
 					"key": "password",
-					"value": "test6",
+					"value": "test1",
 					"description": "",
 					"type": "text",
 					"enabled": true
@@ -202,7 +202,7 @@
 			"tests": null,
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1506293491926,
+			"time": 1506296540108,
 			"name": "Login",
 			"description": "",
 			"collectionId": "8b6db310-113e-1bd7-73ed-f52f9a565952",
@@ -389,11 +389,11 @@
 			"id": "70377c29-00e9-1ce4-154e-1098543d58cf",
 			"headers": "",
 			"headerData": [],
-			"url": "http://homework1-group5.azurewebsites.net/api/Messages?receiverId=accfb6ba-6b1a-4ce1-b397-e36ee67444ed",
+			"url": "http://homework1-group5.azurewebsites.net/api/Messages?receiverId=8c2f69d7-4559-4531-83d5-648d3410cbfd",
 			"queryParams": [
 				{
 					"key": "receiverId",
-					"value": "accfb6ba-6b1a-4ce1-b397-e36ee67444ed",
+					"value": "8c2f69d7-4559-4531-83d5-648d3410cbfd",
 					"equals": true,
 					"description": "",
 					"enabled": true
@@ -408,7 +408,7 @@
 			"tests": null,
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1506293611543,
+			"time": 1506304969203,
 			"name": "Get Messages for user ",
 			"description": "",
 			"collectionId": "8b6db310-113e-1bd7-73ed-f52f9a565952",
@@ -425,7 +425,7 @@
 					"enabled": true
 				}
 			],
-			"url": "http://homework1-group5.azurewebsites.net/Users",
+			"url": "http://homework1-group5.azurewebsites.net/api/Users",
 			"queryParams": [],
 			"preRequestScript": null,
 			"pathVariables": {},
@@ -437,7 +437,7 @@
 			"tests": null,
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1506293502555,
+			"time": 1506297097762,
 			"name": "GetUsersList",
 			"description": "",
 			"collectionId": "8b6db310-113e-1bd7-73ed-f52f9a565952",
