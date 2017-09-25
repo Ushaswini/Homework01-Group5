@@ -15,11 +15,12 @@ using LocationAwareMessageMeApp.Models;
 using System.Net.Http;
 using Newtonsoft.Json;
 using Android.Util;
+using EstimoteSdk;
 
 namespace LocationAwareMessageMeApp
 {
-    [Activity(Label = "RegisterActivity")]
-    //, Theme ="@style / Theme.AppCompat"
+    [Activity(Label = "Register")]
+    
     public class RegisterActivity : Activity
     {
         EditText etFirstName;
@@ -28,12 +29,19 @@ namespace LocationAwareMessageMeApp
         EditText etPassword;
         EditText etConfirmPassword;
         Button btnRegister;
+        ProgressDialog _progressDialog;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+
             SetContentView(Resource.Layout.Register);
+
+            SystemRequirementsChecker.CheckWithDefaultDialogs(this);
+
             Init();
+
+            SetIcon();
         }
 
         private void Init()
@@ -61,6 +69,7 @@ namespace LocationAwareMessageMeApp
                 NetworkInfo info = service.ActiveNetworkInfo;
                 if (info != null)
                 {
+                    ShowProgress("Working...");
                     var user = new RegisterBindingModel
                     {
                         UserName = userName,
@@ -70,24 +79,25 @@ namespace LocationAwareMessageMeApp
                         ConfirmPassword = confirmPassword
                     };
 
-                    HttpClient client = new HttpClient();
-
-                    StringContent content = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8,
-                                "application/json");
-
-
-                    HttpResponseMessage result = await client.PostAsync(Constants.REGISTER_URL, new FormUrlEncodedContent(user.ToMap()));
-
-                    if (result.IsSuccessStatusCode)
+                    using (var client = new HttpClient())
                     {
-                        Toast.MakeText(this, "Registration Successful", ToastLength.Short).Show();
-                        Intent GoBackToLogin = new Intent(this, typeof(LoginActivity));
-                        StartActivity(GoBackToLogin);
-                        Finish();
-                    }
-                    else
-                    {
-                        Log.Debug(Constants.TAG, "Error occured");
+                        client.DefaultRequestHeaders.Accept.Clear();
+                        HttpResponseMessage result = await client.PostAsync(Constants.REGISTER_URL, new FormUrlEncodedContent(user.ToMap()));
+
+                        if (result.IsSuccessStatusCode)
+                        {
+                            Toast.MakeText(this, "Registration Successful", ToastLength.Short).Show();
+                            //Intent GoBackToLogin = new Intent(this, typeof(LoginActivity));
+                            //StartActivity(GoBackToLogin);
+                            EndProgress();
+                            Finish();
+                        }
+                        else
+                        {
+                            EndProgress();
+                            Toast.MakeText(this, "Registration NOT Successful", ToastLength.Short).Show();
+                            Log.Debug(Constants.TAG, "Error occured");
+                        }
                     }
                 }
                 else
@@ -138,6 +148,28 @@ namespace LocationAwareMessageMeApp
            
             return isInvalid;
             
+        }
+
+        private void SetIcon()
+        {
+            ActionBar.SetDisplayOptions(ActionBarDisplayOptions.ShowTitle, ActionBarDisplayOptions.UseLogo);
+            ActionBar.SetDisplayShowHomeEnabled(true);
+            ActionBar.SetLogo(Resource.Drawable.ic_launcher);
+            ActionBar.SetDisplayUseLogoEnabled(true);
+        }
+
+        private void ShowProgress(string message)
+        {
+            _progressDialog = new ProgressDialog(this);
+            _progressDialog.SetMessage(message);
+            _progressDialog.SetProgressStyle(ProgressDialogStyle.Spinner);
+            _progressDialog.SetCancelable(false);
+            _progressDialog.Show();
+        }
+
+        private void EndProgress()
+        {
+            _progressDialog.Dismiss();
         }
     }
 }

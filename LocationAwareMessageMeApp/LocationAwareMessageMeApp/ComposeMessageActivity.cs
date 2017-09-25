@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 using Android.App;
 using Android.Content;
 using Android.OS;
-using Android.Runtime;
-using Android.Views;
 using Android.Widget;
 using Android.Preferences;
 using System.Net.Http;
@@ -15,10 +10,11 @@ using Newtonsoft.Json;
 using LocationAwareMessageMeApp.Models;
 using System.Threading.Tasks;
 using Android.Util;
+using System.Net.Http.Headers;
 
 namespace LocationAwareMessageMeApp
 {
-    [Activity(Label = "ComposeMessageActivity")]
+    [Activity(Label = "Compose Message")]
     public class ComposeMessageActivity : Activity
     {
         TextView tvMessageTo;
@@ -27,6 +23,7 @@ namespace LocationAwareMessageMeApp
         Button btnSend;
         ImageButton ibListUsers;
         ImageButton ibListRegions;
+        ProgressDialog _progressDialog;
 
         ISharedPreferences pref;
         string Access_Token = "";
@@ -34,66 +31,79 @@ namespace LocationAwareMessageMeApp
         private List<Region> Regions;
         private List<User> Users;
 
-        Region SelectedRegion;
-        User SelectedUser;
+        string SelectedRegionId;
+        string SelectedUserId;
         User CurrentUser;
 
-        protected override void OnCreate(Bundle savedInstanceState)
+        protected async override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.ComposeMessage);
-            Init();
+            SetIcon();
+            ShowProgress("Loading!!");
+            await Init();
         }
 
-        protected async override void OnResume()
+        protected  override void OnResume()
         {
             base.OnResume();
-            await GetDataAsync();
+            
         }
 
         protected async Task GetDataAsync()
         {
             try
             {
-                HttpClient client = new HttpClient();
-                client.DefaultRequestHeaders.Add("Authorization", Access_Token);
-
-                HttpResponseMessage regions = await client.GetAsync(Constants.GET_REGIONS_URL);
-                var users = await client.GetAsync(Constants.GET_USERS_URL);
-
-                if (regions.IsSuccessStatusCode)
+                using (var client = new HttpClient())
                 {
-                    var jsonRegions = await regions.Content.ReadAsStringAsync();
-                    Log.Debug(Constants.TAG, jsonRegions);
-                    var regionsList = JsonConvert.DeserializeObject<List<Region>>(jsonRegions);
-                    RunOnUiThread(() =>
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Access_Token);
+
+
+
+                    HttpResponseMessage regions = await client.GetAsync(Constants.GET_REGIONS_URL);
+                    var users = await client.GetAsync(Constants.GET_USERS_URL);
+
+                    if (regions.IsSuccessStatusCode)
                     {
-                        Regions.Clear();
-                        Regions.AddRange(regionsList);
-                    });
-                }
-                else
-                {
-                    Log.Debug(Constants.TAG, "In else");
-                }
-
-                if (users.IsSuccessStatusCode)
-                {
-                    var jsonUsers = await users.Content.ReadAsStringAsync();
-                    Log.Debug(Constants.TAG, jsonUsers);
-                    var usersList = JsonConvert.DeserializeObject<List<User>>(jsonUsers);
-                    RunOnUiThread(() =>
+                        var jsonRegions = await regions.Content.ReadAsStringAsync();
+                        Log.Debug(Constants.TAG, jsonRegions);
+                        var regionsList = JsonConvert.DeserializeObject<List<Region>>(jsonRegions);
+                        RunOnUiThread(() =>
+                        {
+                            Regions.Clear();
+                            Regions.AddRange(regionsList);
+                            
+                        });
+                    }
+                    else
                     {
-                        Users.Clear();
-                        Users.AddRange(usersList);
-                    });
+                        EndProgress();
+                        Toast.MakeText(this, "Error occured", ToastLength.Short).Show();
+                        Finish();
+                        Log.Debug(Constants.TAG, "In else");
+                    }
+
+                    if (users.IsSuccessStatusCode)
+                    {
+                        var jsonUsers = await users.Content.ReadAsStringAsync();
+                        Log.Debug(Constants.TAG, jsonUsers);
+                        var usersList = JsonConvert.DeserializeObject<List<User>>(jsonUsers);
+                        RunOnUiThread(() =>
+                        {
+                            Users.Clear();
+                            Users.AddRange(usersList);
+                        });
+                    }
+                    else
+                    {
+                        EndProgress();
+                        Toast.MakeText(this, "Error occured", ToastLength.Short).Show();
+                        Finish();
+                        Log.Debug(Constants.TAG, "In else");
+                    }
+
                 }
-                else
-                {
-                    Log.Debug(Constants.TAG, "In else");
-                }
-                
-                
             }
             catch(HttpRequestException exp)
             {
@@ -103,14 +113,11 @@ namespace LocationAwareMessageMeApp
             {
                 Log.Error(Constants.TAG, e.Message);
             }
-
-
-           
-
         }
 
-        private void Init()
+        private async Task Init()
         {
+            
             pref = PreferenceManager.GetDefaultSharedPreferences(this);
             Access_Token = pref.GetString(Constants.PREF_TOKEN_TAG, "");
             CurrentUser = JsonConvert.DeserializeObject<User>(pref.GetString(Constants.PREF_USER_TAG, ""));
@@ -129,6 +136,36 @@ namespace LocationAwareMessageMeApp
             Regions = new List<Region>();
             Users = new List<User>();
 
+            if(Intent.Extras != null)
+            {
+                if (Intent.Extras.ContainsKey(Constants.REPLY_MESSAGE_TAG))
+                {
+                    ibListRegions.Enabled = false;
+                    ibListUsers.Enabled = false;
+
+                    Models.Message messageToReplyTo = JsonConvert.DeserializeObject<Models.Message>(Intent.Extras.GetString(Constants.REPLY_MESSAGE_TAG));
+
+                    SelectedRegionId = messageToReplyTo.RegionId;
+                    SelectedUserId = messageToReplyTo.SenderId;
+                    tvMessageTo.Text = "To: " + messageToReplyTo.SenderFullName;
+                    tvRegion.Text = "Region: " + messageToReplyTo.RegionName;
+                    EndProgress();
+
+                }
+            }
+            else
+            {
+                await GetDataAsync().ContinueWith((task) =>
+                {
+                    RunOnUiThread(() =>
+                    {
+                        EndProgress();
+                    });
+
+                });
+            }
+            
+
         }
 
         private void OnListRegions(object sender, EventArgs eventArgs)
@@ -138,16 +175,17 @@ namespace LocationAwareMessageMeApp
             ArrayAdapter<string> RegionsAdapter = new ArrayAdapter<string>(ApplicationContext, Android.Resource.Layout.SimpleListItem1);
             RegionsAdapter.AddAll(Regions);
             builder.SetAdapter(RegionsAdapter, (s, e) => {
-                SelectedRegion = Regions[e.Which];
-                tvRegion.Text = "From: " + SelectedRegion.RegionName;
-                Log.Debug(Constants.TAG, SelectedRegion.ToString());
+                SelectedRegionId = Regions[e.Which].RegionId;
+                tvRegion.Text = "From: " + Regions[e.Which].RegionName;
+                Log.Debug(Constants.TAG, Regions[e.Which].RegionName);
             });
+            
 
             var dialog = builder.Create();
             dialog.Show();
-            
-        }
+            //dialog.Window.SetBackgroundDrawableResource(Resource.Color.background_material_dark);
 
+        }
 
         private void OnListUsers(object sender, EventArgs eventArgs)
         {
@@ -156,9 +194,9 @@ namespace LocationAwareMessageMeApp
             ArrayAdapter<string> UsersAdapter = new ArrayAdapter<string>(ApplicationContext, Android.Resource.Layout.SimpleListItem1);
             UsersAdapter.AddAll(Users);
             builder.SetAdapter(UsersAdapter, (s, e) => {
-                SelectedUser = Users[e.Which];
-                tvMessageTo.Text = "To: " + SelectedUser.ToString();
-                Log.Debug(Constants.TAG, SelectedUser.ToString());
+                SelectedUserId = Users[e.Which].Id;
+                tvMessageTo.Text = "To: " + Users[e.Which].FirstName + " " + Users[e.Which].LastName;
+                Log.Debug(Constants.TAG, SelectedUserId.ToString());
             });
 
             var dialog = builder.Create();
@@ -171,37 +209,49 @@ namespace LocationAwareMessageMeApp
             {
                 if (!IsInValidInput())
                 {
+                    ShowProgress("Sending....");
                     Models.Message message = new Models.Message
                     {
                         SenderId = CurrentUser.Id,
-                        ReceiverId = SelectedUser.Id,
+                        ReceiverId = SelectedUserId,
                         MessageBody = etMessageBody.Text,
-                        MessageTime = new DateTime().ToString(),
-                        IsRead = false
+                        MessageTime = DateTime.Now.ToString("yyyy/MM/dd HH: mm:ss tt"),
+                        IsRead = false,
+                        IsUnLocked = false,
+                        RegionId=SelectedRegionId
                     };
-                    HttpClient client = new HttpClient();
 
-                    StringContent content = new StringContent(JsonConvert.SerializeObject(message), Encoding.UTF8,
-                                "application/json");
-
-
-                    HttpResponseMessage result = await client.PostAsync(Constants.SEND_MESSAGE_URL, new FormUrlEncodedContent(message.ToMap()));
-
-                    if (result.IsSuccessStatusCode)
+                    using (var client = new HttpClient())
                     {
-                        Toast.MakeText(this, "Message sent!", ToastLength.Short).Show();
-                        Intent GoBackToInbox = new Intent(this, typeof(InboxActivity));
-                        StartActivity(GoBackToInbox);
-                        Finish();
-                    }
-                    else
-                    {
-                        Log.Debug(Constants.TAG, "Error occured");
+                        client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Access_Token);
+
+                        HttpResponseMessage result = await client.PostAsync(Constants.SEND_MESSAGE_URL, new FormUrlEncodedContent(message.ToMap()));
+
+                        if (result.IsSuccessStatusCode)
+                        {
+                            EndProgress();
+                            Toast.MakeText(this, "Message sent!", ToastLength.Short).Show();
+                            Intent GoBackToInbox = new Intent(this, typeof(InboxActivity));
+                            GoBackToInbox.AddFlags(ActivityFlags.NewTask | ActivityFlags.ClearTask);
+                            StartActivity(GoBackToInbox);
+                            Finish();
+                        }
+                        else
+                        {
+                            Log.Debug(Constants.TAG, "Error occured");
+                            Log.Debug(Constants.TAG, result.ToString());
+                            EndProgress();
+                            Toast.MakeText(this, "Error occured", ToastLength.Short).Show();
+                            Finish();                            
+                        }
                     }
                 }
             }catch(Exception exp)
             {
                 Log.Debug(Constants.TAG, exp.Message);
+                Toast.MakeText(this, "Error occured", ToastLength.Short).Show();
+                Finish();
             }
             
         }
@@ -209,11 +259,11 @@ namespace LocationAwareMessageMeApp
         private bool IsInValidInput()
         {
             bool isInvalid = false;
-            if(SelectedRegion == null)
+            if(SelectedRegionId == null)
             {
                 isInvalid = true;  
             }
-            if(SelectedUser == null)
+            if(SelectedUserId == null)
             {
                 isInvalid = true;
             }
@@ -225,5 +275,26 @@ namespace LocationAwareMessageMeApp
             
         }
 
+        private void SetIcon()
+        {
+            ActionBar.SetDisplayOptions(ActionBarDisplayOptions.ShowTitle, ActionBarDisplayOptions.UseLogo);
+            ActionBar.SetDisplayShowHomeEnabled(true);
+            ActionBar.SetLogo(Resource.Drawable.ic_launcher);
+            ActionBar.SetDisplayUseLogoEnabled(true);
+        }
+
+        private void ShowProgress(string message)
+        {
+            _progressDialog = new ProgressDialog(this);
+            _progressDialog.SetMessage(message);
+            _progressDialog.SetProgressStyle(ProgressDialogStyle.Spinner);
+            _progressDialog.SetCancelable(false);
+            _progressDialog.Show();
+        }
+
+        private void EndProgress()
+        {
+            _progressDialog.Dismiss();
+        }
     }
 }

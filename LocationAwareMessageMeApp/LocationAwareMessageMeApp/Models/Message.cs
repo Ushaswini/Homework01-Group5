@@ -13,7 +13,16 @@ namespace LocationAwareMessageMeApp.Models
         public string ReceiverId { get; set; }
         public string SenderId { get; set; }
 
+        public bool IsUnLocked { get; set; }
+        public string RegionId { get; set; }
+
         public string MessageTime { get; set; }
+
+        public string RegionName { get; set; }
+        public string SenderUserName { get; set; }
+        public string SenderFullName { get; set; }
+        public string ReceiverUserName { get; set; }
+        public string ReceiverFullName { get; set; }
 
         public Dictionary<string, string> ToMap()
         {
@@ -25,6 +34,8 @@ namespace LocationAwareMessageMeApp.Models
             parameters.Add("ReceiverId", this.ReceiverId);
             parameters.Add("SenderId", this.SenderId);
             parameters.Add("MessageTime", this.MessageTime);
+            parameters.Add("IsLocked", this.IsUnLocked + "");
+            parameters.Add("RegionId", this.RegionId);
             
 
 

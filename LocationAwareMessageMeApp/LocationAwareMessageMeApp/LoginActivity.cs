@@ -12,6 +12,8 @@ using Android.Util;
 using Android.Preferences;
 using Android.Net;
 using Android.Support.Design.Widget;
+using System.Net.Http.Headers;
+using EstimoteSdk;
 
 namespace LocationAwareMessageMeApp
 {
@@ -22,6 +24,8 @@ namespace LocationAwareMessageMeApp
         EditText etPassword;
         Button btnLogin;
         Button btnRegister;
+        ProgressDialog _progressDialog;
+
         ISharedPreferences pref;
         ISharedPreferencesEditor prefEditor;
 
@@ -31,14 +35,15 @@ namespace LocationAwareMessageMeApp
 
             SetContentView(Resource.Layout.Login);
 
+            SetIcon();
+
             Init();
-            // Create your application here
         }
 
         protected override void OnResume()
         {
             base.OnResume();
-            //SystemRequirementsChecker.CheckWithDefaultDialogs(this);
+            SystemRequirementsChecker.CheckWithDefaultDialogs(this);
         }
 
         private void Init()
@@ -49,6 +54,7 @@ namespace LocationAwareMessageMeApp
             btnRegister = FindViewById<Button>(Resource.Id.signup);
             btnLogin.Click += OnLoginClicked;
             btnRegister.Click += OnRegisterClicked;
+
             pref = PreferenceManager.GetDefaultSharedPreferences(this);
             prefEditor = pref.Edit();
         }
@@ -73,51 +79,59 @@ namespace LocationAwareMessageMeApp
 
                 if (info != null)
                 {
-                    HttpClient client = new HttpClient();
-                    Dictionary<string, string> parameters = new Dictionary<string, string>();
+                    ShowProgress("Trying to login..");
 
-                    parameters.Add("grant_type", "password");
-                    parameters.Add("username", username);
-                    parameters.Add("password", password);
-
-                    try
+                    using (var client = new HttpClient())
                     {
-                        HttpResponseMessage result = await client.PostAsync(Constants.LOGIN_URL, new FormUrlEncodedContent(parameters));
+                        client.DefaultRequestHeaders.Accept.Clear();
 
-                        if (result.IsSuccessStatusCode)
+                        Dictionary<string, string> parameters = new Dictionary<string, string>();
+
+                        parameters.Add("grant_type", "password");
+                        parameters.Add("username", username);
+                        parameters.Add("password", password);
+
+                        try
                         {
-                            string jsonResult = await result.Content.ReadAsStringAsync();
-                            // TokenResult is a custom model class for deserialization of the Token Endpoint
-                            
-                            var resultObject = JsonConvert.DeserializeObject<TokenModel>(jsonResult);
-                            string token = Constants.BEARER + resultObject.Access_Token;
+                            HttpResponseMessage result = await client.PostAsync(Constants.LOGIN_URL, new FormUrlEncodedContent(parameters));
 
-                            client.DefaultRequestHeaders.Add("Authorization", token);
-                            var profile = await client.GetAsync(String.Format(Constants.USER_PROFILE_URL, resultObject.Access_Token));
+                            if (result.IsSuccessStatusCode)
+                            {
+                                string jsonResult = await result.Content.ReadAsStringAsync();
+                                // TokenResult is a custom model class for deserialization of the Token Endpoint
 
-                            var jsonProfile = await profile.Content.ReadAsStringAsync();
-                            var user = JsonConvert.DeserializeObject<User>(jsonProfile);
+                                var resultObject = JsonConvert.DeserializeObject<TokenModel>(jsonResult);
 
-                   
-                            prefEditor.PutString(Constants.PREF_USER_TAG, JsonConvert.SerializeObject(user));
-                            prefEditor.PutString(Constants.PREF_TOKEN_TAG, token);
-                            prefEditor.Apply();
+                                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", resultObject.Access_Token);
+                                
+                                var profile = await client.GetAsync(String.Format(Constants.USER_PROFILE_URL, resultObject.Access_Token));
 
-                            Intent openInbox = new Intent(this, typeof(InboxActivity));
-                            StartActivity(openInbox);
-                            Finish();
+                                var jsonProfile = await profile.Content.ReadAsStringAsync();
+                                var user = JsonConvert.DeserializeObject<User>(jsonProfile);
+
+
+                                prefEditor.PutString(Constants.PREF_USER_TAG, JsonConvert.SerializeObject(user));
+                                prefEditor.PutString(Constants.PREF_TOKEN_TAG, resultObject.Access_Token);
+                                prefEditor.Apply();
+
+                                Intent openInbox = new Intent(this, typeof(InboxActivity));
+                                StartActivity(openInbox);
+                                EndProgress();
+                                Finish();
+                            }
+                            else
+                            {
+                                EndProgress();
+                                Log.Debug(Constants.TAG, "Error occured");
+
+
+                                //todo: get message and show
+                            }
                         }
-                        else
+                        catch (Exception oExcep)
                         {
-                            Log.Debug(Constants.TAG, "Error occured");
-
-
-                            //todo: get message and show
+                            Log.Error(Constants.TAG, oExcep.Message);
                         }
-                    }
-                    catch (Exception oExcep)
-                    {
-                        Log.Error(Constants.TAG, oExcep.Message);
                     }
 
                 }
@@ -147,6 +161,28 @@ namespace LocationAwareMessageMeApp
             }
 
             return isInValid;
+        }
+
+        private void SetIcon()
+        {
+            ActionBar.SetDisplayOptions(ActionBarDisplayOptions.ShowTitle, ActionBarDisplayOptions.UseLogo);
+            ActionBar.SetDisplayShowHomeEnabled(true);
+            ActionBar.SetLogo(Resource.Drawable.ic_launcher);
+            ActionBar.SetDisplayUseLogoEnabled(true);
+        }
+
+        private void ShowProgress(string message)
+        {
+            _progressDialog = new ProgressDialog(this);
+            _progressDialog.SetMessage(message);
+            _progressDialog.SetProgressStyle(ProgressDialogStyle.Spinner);
+            _progressDialog.SetCancelable(false);
+            _progressDialog.Show();
+        }
+
+        private void EndProgress()
+        {
+            _progressDialog.Dismiss();
         }
     }
 }
