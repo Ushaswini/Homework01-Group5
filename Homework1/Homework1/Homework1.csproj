@@ -241,6 +241,8 @@
     <Compile Include="Controllers\MessagesController.cs" />
     <Compile Include="Controllers\RegionsController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
+    <Compile Include="DTO\MessageDTO.cs" />
+    <Compile Include="DTO\UserDTO.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

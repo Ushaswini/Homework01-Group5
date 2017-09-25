@@ -1,10 +1,8 @@
-﻿using Homework1.Models;
-using Microsoft.AspNet.Identity;
+﻿using Homework1.DTO;
+using Homework1.Models;
 using Microsoft.AspNet.Identity.Owin;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 
@@ -29,9 +27,15 @@ namespace Homework1.Controllers
 
         // GET: api/Users
         
-        public List<ApplicationUser> GetUsers()
+        public List<UserDTO> GetUsers()
         {
-            return UserManager.Users.ToList();
+            return UserManager.Users.Select(u => new UserDTO {
+                Id = u.Id,
+                FirstName=u.FirstName,
+                LastName=u.LastName,
+                UserName=u.UserName
+
+            }).ToList();
         }
     }
 }

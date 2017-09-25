@@ -15,6 +15,7 @@ using System.IdentityModel.Tokens;
 using System.IdentityModel.Claims;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.Data.Entity.Migrations;
+using Homework1.DTO;
 
 namespace Homework1.Controllers
 {
@@ -25,19 +26,48 @@ namespace Homework1.Controllers
 
         // GET: api/Messages
         
-        public IList<Message> GetMessages()
+        public IList<MessageDTO> GetMessages()
         {
             return db.Messages.Include(m => m.Region)
                                 .Include(m => m.Receiver)
-                                .Include(m =>m.Sender).ToList();
-        }
+                                .Include(m => m.Sender).Select(m => new MessageDTO {
+                                    Id = m.Id,
+                                    ReceiverId = m.ReceiverId,
+                                    SenderId=m.SenderId,
+                                    MessageBody=m.MessageBody,
+                                    MessageTime=m.MessageTime,
+                                    IsRead=m.IsRead,
+                                    IsUnLocked=m.IsUnLocked,
+                                    RegionId=m.RegionId,
+                                    RegionName=m.Region.RegionName,
+                                    SenderUserName=m.Sender.UserName,
+                                    ReceiverUserName=m.Receiver.UserName,
+                                    SenderFullName = m.Sender.FirstName + " "+ m.Sender.LastName,
+                                    ReceiverFullName=m.Receiver.FirstName + " " + m.Receiver.LastName
+                                }).ToList();
+                                }
         
         
-        public IList<Message> GetMessagesForReceiver(string receiverId)
+        public IList<MessageDTO> GetMessagesForReceiver(string receiverId)
         {
-            var result =  db.Messages.Include(m => m.Region)
+            var result = db.Messages.Include(m => m.Region)
                                 .Include(m => m.Receiver)
-                                .Include(m => m.Sender).Where(m => m.ReceiverId == receiverId);
+                                .Include(m => m.Sender).Where(m => m.ReceiverId == receiverId).Select(m => new MessageDTO
+                                {
+                                    Id = m.Id,
+                                    ReceiverId = m.ReceiverId,
+                                    SenderId = m.SenderId,
+                                    MessageBody = m.MessageBody,
+                                    MessageTime = m.MessageTime,
+                                    IsRead = m.IsRead,
+                                    IsUnLocked = m.IsUnLocked,
+                                    RegionId = m.RegionId,
+                                    RegionName = m.Region.RegionName,
+                                    SenderUserName = m.Sender.UserName,
+                                    ReceiverUserName = m.Receiver.UserName,
+                                    SenderFullName = m.Sender.FirstName + " " + m.Sender.LastName,
+                                    ReceiverFullName = m.Receiver.FirstName + " " + m.Receiver.LastName
+                                });
             //var result = from d in db.Messages where d.ReceiverId == (receiverId) select d;
             return result.ToList();
         }
